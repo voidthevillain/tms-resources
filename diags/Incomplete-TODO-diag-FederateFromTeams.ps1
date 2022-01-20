@@ -1,6 +1,7 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
 # INCOMPLETE
 # TODO: to review function Add-DomainToAllowList, to check homing and coexistence mode
+# +++++ TO FURTHER TEST, especially Add-DomainToAllowList for ... appended on 4th item (??? ALWAYS ???)
 
 [CmdletBinding()]
 Param (
@@ -262,6 +263,8 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
 # Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$x}
 # Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$y}
 # Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$z}
+
+# empty block list
 # Set-CsTenantFederationConfiguration -BlockedDomains $null
 
 
