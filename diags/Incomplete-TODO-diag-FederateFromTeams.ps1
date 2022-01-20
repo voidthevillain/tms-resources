@@ -1,7 +1,6 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
-# !!!!!!!!!!!!! INCOMPLETE
-# progress: managed to parse BlockedDomains
-# TODO: parsing allowed/blocked domains too messy - try functions?
+# INCOMPLETE
+# TODO: to review function Add-DomainToAllowList, to check homing and coexistence mode
 
 [CmdletBinding()]
 Param (
@@ -20,33 +19,12 @@ function Output-AllowedDomains {
 
   $ads = $AllowedDomains | Out-String
 
-  # Write-Host 'aha' $ads
-
   Try {
     $ads = $ads.split("<")[1].split(" ")[0]
-  } Catch {
-    # Write-Host 'POG'
-  }
+  } Catch {}
 
   return $ads.trim()
 }
-
-# function Output-BlockedDomains { OBSOLETE
-#   param (
-#     [string[]]$BlockedDomains
-#   )
-
-#   $ds = $BlockedDomains | Out-String
-
-#   write-host 'ds: ' $ds
-
-#   $bds = @{
-#     Domains = $BlockedDomains | Out-String
-#     LengthOfFirst = $BlockedDomains[0].length
-#   }
-
-#   return $bds
-# }
 
 function Parse-AllowedDomains {
   param (
@@ -62,9 +40,12 @@ function Parse-AllowedDomains {
   }
 
   $domainsListX = @()
-  foreach ($dmn in $domainsList) {
-    $DomainsListX += $dmn.split("=")[1]
-  }
+
+  try {
+    foreach ($dmn in $domainsList) {
+     $DomainsListX += $dmn.split("=")[1]
+    }
+  } catch {}
 
   return $domainsListX
 }
@@ -89,6 +70,42 @@ function Parse-BlockedDomains {
   }
   
   return $finalArr
+}
+
+function Remove-DomainFromBlockList {
+    param (
+    [string[]]$D
+  )
+
+  Set-CsTenantFederationConfiguration -BlockedDomains @{Remove=$D}
+}
+
+function Add-DomainToAllowList {
+    param (
+    $DList,
+    $DomainX
+  )
+
+  $list = New-Object Collections.Generic.List[String]
+
+  foreach ($dmn in $DList) {
+    $list.add($dmn)
+  }
+
+  $list.add($DomainX)
+  $list[3] = $list[3].trim('...') # item at index 3 gets appended ... ?????????
+
+  # Write-host $list
+  # Write-host $list.gettype()
+  # write-host $list[3]
+
+  # foreach ($item in $list) {
+  #   $index = $list.indexOf($item)
+  #   list[$index] = $item.trim('...')
+  # }
+
+ 
+  Set-CsTenantFederationConfiguration -AllowedDomainsAsAList $list
 }
 
 
@@ -183,22 +200,27 @@ $allowedDomains = Output-AllowedDomains $federationConfig.AllowedDomains
 # Write-Host 'bds' $bds.Domains
 
 
-
 if ($allowedDomains -eq 'AllowAllKnownDomains') {
   if ($federationConfig.BlockedDomains[0].length -eq 0) {
     Write-Host 'The organization allows federation with all domains (open federation).'
   } else {
     Write-Host 'The organization is blocking federation with the following domains:'
 
-    $parsedBlockedDomains = Parse-BlockedDomains $blockedDomains
+        $parsedBlockedDomains = Parse-BlockedDomains $blockedDomains
 
-    Write-Host $parsedBlockedDomains
-    
-    # $toClearBlockList = Read-Host 'Would you like to clear the block list? [Y/N]'
-    # if ($toClearBlockList -eq 'Y'){
-    #   Set-CsTenantFederationConfiguration -BlockedDomains $null
-    #   Write-Host 'The organization is not blocking federation with any domain.'
-    # } 
+        Write-Host $parsedBlockedDomains
+
+        if ($parsedBlockedDomains -contains $Domain) {
+          $toRemoveDomainFromBlockList = Read-Host 'The organization is blocking federation with the provided domain. Would you like to remove the domain from the block list? [Y/N]'
+          if ($toRemoveDomainFromBlockList -eq 'Y') {
+            Remove-DomainFromBlockList $Domain
+            Write-Host 'The domain was removed from the block list.'
+          } else {
+            return 'The user cannot federate with externals on the provided domain as it is blocked by the organization.'
+          }
+        } else {
+          Write-Host 'The organization is not blocking federation with the provided domain.'
+        }
   }  
 } else {
   Write-Host 'The organization does not allow federation with all domains (closed federation).'
@@ -210,6 +232,18 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
     $parsedAllowedDomains = Parse-AllowedDomains $allowedDomains
 
     Write-Host $parsedAllowedDomains
+
+    if ($parsedAllowedDomains -contains $Domain) {
+      write-host 'The provided domain is included in the allow list.'
+    } else {
+      $toAddDomainToAllowList = Read-Host 'The provided domain is not included in the allow list. Would you like to add it? [Y/N]'
+      if ($toAddDomainToAllowList -eq 'Y') {
+        Add-DomainToAllowList $parsedAllowedDomains $Domain
+        Write-Host 'The provided domain is now included in the allow list.'
+      } else {
+        return 'The user cannot federate with externals on the provided domain as it is not included in the list of domains the organization allows to federate with.'
+      }
+    }
   } 
 }
 
