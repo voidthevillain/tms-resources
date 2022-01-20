@@ -1,4 +1,5 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
+# progress: managed to parse BlockedDomains
 
 [CmdletBinding()]
 Param (
@@ -8,7 +9,7 @@ Param (
   $Domain
 )
 
-$ErrorActionPreference = 'SilentlyContinue' # ??? for line 89
+# $ErrorActionPreference = 'SilentlyContinue' # ??? for line 89
 
 $user = (Get-CsOnlineUser $UPN)
 
@@ -89,11 +90,6 @@ if ($federationConfig.AllowFederatedUsers -eq $true) {
 $allowedDomains = ($federationConfig.AllowedDomains | Out-String).split("<")[1].split(" ")[0] 
 $blockedDomains = ($federationConfig.BlockedDomains | Out-String)
 
-# if ($blockedDomains -eq $null) {
-  # Write-Host $federationConfig.BlockedDomains[0].length
-  # Write-Host $blockedDomains
-  # Write-Host $federationConfig.BlockedDomains
-# }
 
 if ($allowedDomains -eq 'AllowAllKnownDomains') {
   if ($federationConfig.BlockedDomains[0].length -eq 0) {
@@ -102,7 +98,36 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
     Write-Host 'The organization is blocking federation with the following domains:'
     # Write-Host $federationConfig.BlockedDomains
     $domains = $blockedDomains
-    Write-Host $domains
+    $domains = $domains.trimstart().trim()
+    $arr = $domains.trim().split("`r")
+    # Write-Host $domains.trim().split("`r")[1]  GOOOOOD ????
+    # Write-Host $arr.length
+    # 1st domain starts at 0
+    # 1, 3, 5 always useless
+
+    $newArr = @()
+
+    for ($i = 0; $i -lt $arr.length; $i += 2) {
+      # Write-Host $arr[$i]
+      $newArr += $arr[$i]
+    }
+
+    # Write-Host $newArr
+
+    $finalArr = @()
+
+    foreach ($item in $newArr) {
+      $finalArr += $item.split(":")[1].trimstart()
+    }
+
+   
+    Write-Host $finalArr
+    
+    # $toClearBlockList = Read-Host 'Would you like to clear the block list? [Y/N]'
+    # if ($toClearBlockList -eq 'Y'){
+    #   Set-CsTenantFederationConfiguration -BlockedDomains $null
+    #   Write-Host 'The organization is not blocking federation with any domain.'
+    # } 
   }  
 } else {
   Write-Host 'The organization does not allow federation with all domains (closed federation).'
@@ -130,7 +155,9 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
 
   }  
 }
+# Domain : contoso.com
 
+# Domain : fabrikam.com
 
 # allow list
 # $list = New-Object Collections.Generic.List[String]
@@ -142,9 +169,11 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
 # block list
 # $x = New-CsEdgeDomainPattern -Domain "contoso.com"
 # $y = New-CsEdgeDomainPattern -Domain "fabrikam.com"
+# $z = New-CsEdgeDomainPattern -Domain "pogg.com"
 
 # Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$x}
 # Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$y}
+# Set-CsTenantFederationConfiguration -BlockedDomains @{Add=$z}
 # Set-CsTenantFederationConfiguration -BlockedDomains $null
 
 
