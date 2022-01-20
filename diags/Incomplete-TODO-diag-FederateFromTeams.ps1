@@ -1,4 +1,5 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
+# !!!!!!!!!!!!! INCOMPLETE
 # progress: managed to parse BlockedDomains
 # TODO: parsing allowed/blocked domains too messy - try functions?
 
@@ -11,6 +12,85 @@ Param (
 )
 
 # $ErrorActionPreference = 'SilentlyContinue' # ??? for line 89
+
+function Output-AllowedDomains {
+  param (
+    [string[]]$AllowedDomains
+  )
+
+  $ads = $AllowedDomains | Out-String
+
+  # Write-Host 'aha' $ads
+
+  Try {
+    $ads = $ads.split("<")[1].split(" ")[0]
+  } Catch {
+    # Write-Host 'POG'
+  }
+
+  return $ads.trim()
+}
+
+# function Output-BlockedDomains { OBSOLETE
+#   param (
+#     [string[]]$BlockedDomains
+#   )
+
+#   $ds = $BlockedDomains | Out-String
+
+#   write-host 'ds: ' $ds
+
+#   $bds = @{
+#     Domains = $BlockedDomains | Out-String
+#     LengthOfFirst = $BlockedDomains[0].length
+#   }
+
+#   return $bds
+# }
+
+function Parse-AllowedDomains {
+  param (
+    [string[]]$AllowedDomains
+  )
+
+  $domains = $allowedDomains.split(":")[1].split("{")[1].split("}")[0]
+  $domainsList = @()
+  $count = $domains.split(",").length
+
+  for ($i = 0; $i -le $count; $i++) {
+    $domainsList += $domains.split(",")[$i]
+  }
+
+  $domainsListX = @()
+  foreach ($dmn in $domainsList) {
+    $DomainsListX += $dmn.split("=")[1]
+  }
+
+  return $domainsListX
+}
+
+function Parse-BlockedDomains {
+  param (
+    [string[]]$BlockedDomains
+  )
+
+  $domains = $BlockedDomains
+  $domains = $domains.trimstart().trim()
+  $arr = $domains.trim().split("`r")
+
+  $newArr = @()
+  for ($i = 0; $i -lt $arr.length; $i += 2) {
+    $newArr += $arr[$i]
+  }
+
+  $finalArr = @()
+  foreach ($item in $newArr) {
+    $finalArr += $item.split(":")[1].trimstart()
+  }
+  
+  return $finalArr
+}
+
 
 $user = (Get-CsOnlineUser $UPN)
 
@@ -88,8 +168,20 @@ if ($federationConfig.AllowFederatedUsers -eq $true) {
   }
 }
 
-$allowedDomains = ($federationConfig.AllowedDomains | Out-String).split("<")[1].split(" ")[0] 
+# $allowedDomains = ($federationConfig.AllowedDomains | Out-String).split("<")[1].split(" ")[0] 
 $blockedDomains = ($federationConfig.BlockedDomains | Out-String)
+$allowedDomains = Output-AllowedDomains $federationConfig.AllowedDomains
+# $blockedDomains = Output-BlockedDomains $federationConfig.BlockedDomains
+
+# Write-Host $blockedDomains.Domains
+# Write-Host $blockedDomains.LengthOfFirst
+# Write-Host $allowedDomains.length
+
+# Write-Host $blockedDomains
+
+# $bds = Output-BlockedDomains $federationConfig.BlockedDomains
+# Write-Host 'bds' $bds.Domains
+
 
 
 if ($allowedDomains -eq 'AllowAllKnownDomains') {
@@ -97,32 +189,10 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
     Write-Host 'The organization allows federation with all domains (open federation).'
   } else {
     Write-Host 'The organization is blocking federation with the following domains:'
-    # Write-Host $federationConfig.BlockedDomains
-    $domains = $blockedDomains
-    $domains = $domains.trimstart().trim()
-    $arr = $domains.trim().split("`r")
-    # Write-Host $domains.trim().split("`r")[1]  GOOOOOD ????
-    # Write-Host $arr.length
-    # 1st domain starts at 0
-    # 1, 3, 5 always useless
 
-    $newArr = @()
+    $parsedBlockedDomains = Parse-BlockedDomains $blockedDomains
 
-    for ($i = 0; $i -lt $arr.length; $i += 2) {
-      # Write-Host $arr[$i]
-      $newArr += $arr[$i]
-    }
-
-    # Write-Host $newArr
-
-    $finalArr = @()
-
-    foreach ($item in $newArr) {
-      $finalArr += $item.split(":")[1].trimstart()
-    }
-
-   
-    Write-Host $finalArr
+    Write-Host $parsedBlockedDomains
     
     # $toClearBlockList = Read-Host 'Would you like to clear the block list? [Y/N]'
     # if ($toClearBlockList -eq 'Y'){
@@ -136,29 +206,12 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
 
   If ($allowedDomains.split(":")[0].trim() -eq 'AllowedDomain') {
     Write-Host "The organization only allows federation with the domains included in the allow list:"
-    $domains = $allowedDomains.split(":")[1].split("{")[1].split("}")[0]
-    $domainsList = @()
-    $count = $domains.split(",").length
+    
+    $parsedAllowedDomains = Parse-AllowedDomains $allowedDomains
 
-    for ($i = 0; $i -le $count; $i++) {
-      $domainsList += $domains.split(",")[$i]
-    }
-
-    $domainsListX = @()
-
-    foreach ($dmn in $domainsList) {
-      $DomainsListX += $dmn.split("=")[1]
-    }
-
-    # Write-Host $count, $domains
-    Write-Host $domainsListX
-  } else {
-
-  }  
+    Write-Host $parsedAllowedDomains
+  } 
 }
-# Domain : contoso.com
-
-# Domain : fabrikam.com
 
 # allow list
 # $list = New-Object Collections.Generic.List[String]
