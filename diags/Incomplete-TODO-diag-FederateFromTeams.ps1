@@ -1,5 +1,6 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
 # progress: managed to parse BlockedDomains
+# TODO: parsing allowed/blocked domains too messy - try functions?
 
 [CmdletBinding()]
 Param (
