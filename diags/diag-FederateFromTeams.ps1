@@ -1,6 +1,6 @@
 # requires Connect-MicrosoftTeams, Connect-MsolService
 # INCOMPLETE
-# TODO: to review function Add-DomainToAllowList, to check homing and coexistence mode
+# TODO: to review function Add-DomainToAllowList - BROKEN
 # +++++ TO FURTHER TEST, especially Add-DomainToAllowList for ... appended on 4th item (??? ALWAYS ???)
 
 [CmdletBinding()]
@@ -10,8 +10,6 @@ Param (
   $UPN,
   $Domain
 )
-
-# $ErrorActionPreference = 'SilentlyContinue' # ??? for line 89
 
 function Output-AllowedDomains {
   param (
@@ -94,17 +92,9 @@ function Add-DomainToAllowList {
   }
 
   $list.add($DomainX)
-  $list[3] = $list[3].trim('...') # item at index 3 gets appended ... ?????????
-
-  # Write-host $list
-  # Write-host $list.gettype()
-  # write-host $list[3]
-
-  # foreach ($item in $list) {
-  #   $index = $list.indexOf($item)
-  #   list[$index] = $item.trim('...')
-  # }
-
+  try {
+    $list[3] = $list[3].trim('...') # item at index 3 gets appended ... ?????????
+  } catch {}
  
   Set-CsTenantFederationConfiguration -AllowedDomainsAsAList $list
 }
@@ -186,20 +176,8 @@ if ($federationConfig.AllowFederatedUsers -eq $true) {
   }
 }
 
-# $allowedDomains = ($federationConfig.AllowedDomains | Out-String).split("<")[1].split(" ")[0] 
 $blockedDomains = ($federationConfig.BlockedDomains | Out-String)
 $allowedDomains = Output-AllowedDomains $federationConfig.AllowedDomains
-# $blockedDomains = Output-BlockedDomains $federationConfig.BlockedDomains
-
-# Write-Host $blockedDomains.Domains
-# Write-Host $blockedDomains.LengthOfFirst
-# Write-Host $allowedDomains.length
-
-# Write-Host $blockedDomains
-
-# $bds = Output-BlockedDomains $federationConfig.BlockedDomains
-# Write-Host 'bds' $bds.Domains
-
 
 if ($allowedDomains -eq 'AllowAllKnownDomains') {
   if ($federationConfig.BlockedDomains[0].length -eq 0) {
@@ -248,6 +226,28 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
   } 
 }
 
+$userHoming = (Get-CsOnlineUser $UPN).HostingProvider
+
+if ($userHoming -eq 'sipfed.online.lync.com') {
+  Write-Host 'The user is homed online in Skype for Business.'
+} else {
+  return 'The user is not homed online in Skype for Business. Please move the user to cloud with the Move-CsUser cmdlet for the user to be able to federate from Teams.'
+}
+
+$userCoexistenceMode = (Get-CsOnlineUser $UPN).TeamsUpgradeEffectiveMode
+
+if ($userCoexistenceMode -eq 'TeamsOnly') {
+  Write-Host 'The user is set up for TeamsOnly.'
+} else {
+  $toUpgradeToTeams = Read-Host 'The user is not set up for TeamsOnly. Would you like to upgrade the user? [Y/N]'
+  if ($toUpgradeToTeams -eq 'Y') {
+    Grant-CsTeamsUpgradePolicy -Identity $UPN -PolicyName UpgradeToTeams
+    Write-Host 'The user is now upgraded to TeamsOnly.'
+  } else {
+    return 'The user cannot federate with external in Teams as the user is not set up for TeamsOnly.'
+  }
+}
+
 # allow list
 # $list = New-Object Collections.Generic.List[String]
 # $list.add("contoso.com")
@@ -272,3 +272,12 @@ if ($allowedDomains -eq 'AllowAllKnownDomains') {
 # $x = New-CsEdgeAllowAllKnownDomains
 # Set-CsTenantFederationConfiguration -AllowedDomainsAsAList $x
 
+
+# any mess?
+# enable federation
+# Set-CsTenantFederationConfiguration -AllowFederatedUsers $true
+# empty block list
+# Set-CsTenantFederationConfiguration -BlockedDomains $null
+# empty allow list
+# $x = New-CsEdgeAllowAllKnownDomains
+# Set-CsTenantFederationConfiguration -AllowedDomainsAsAList $x
