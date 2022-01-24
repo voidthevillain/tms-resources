@@ -6,7 +6,7 @@ $outlook = Get-Process Outlook -ErrorAction SilentlyContinue
 # check if Outlook is running and quit it to clear add-in cache
 if ($outlook) {
   Write-Host 'Outlook is running. Quitting Outlook.'
-  $outlook | Stop-Process
+  $outlook | Stop-Process -Force
   Start-Sleep 2
 } else {
   Write-Host 'Outlook is not running.'
