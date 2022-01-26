@@ -5,11 +5,11 @@
 # FOR A PARTICULAR PURPOSE. THE ENTIRE RISK OF USE, INABILITY TO USE, OR 
 # RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Author: Mihai Filip
+# AUTHOR: Mihai Filip
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Dependencies: Connect-MsolService, Connect-ExchangeOnline, Connect-MicrosoftTeams
+# DEPENDENCIES: Connect-MsolService, Connect-ExchangeOnline, Connect-MicrosoftTeams
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Usage: 
+# USAGE: 
 # Connect-MsolService
 # Connect-ExchangeOnline
 # Connect-MicrosoftTeams
