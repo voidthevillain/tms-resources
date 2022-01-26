@@ -13,7 +13,7 @@
 # Connect-MsolService
 # Connect-ExchangeOnline
 # Connect-MicrosoftTeams
-# .\tms-AddToPrivateChannel.ps1 user@domain.com team@domain.com
+# .\tms-CannotAddUserToPrivateChannel.ps1 user@domain.com team@domain.com
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 [CmdletBinding()]
 Param (
