@@ -135,6 +135,10 @@ if ($issuePersists -eq 'Y') {
   Write-Host "User $($UPN) (MSO):"
   Get-MsolUser -UserPrincipalName $UPN
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
+  Write-Host "User licenses (MSO):"
+  Write-Host "Subscriptions:"$userLicenses.SKU
+  Write-Host "Service plans:"$userLicenses.ServicePlans
+  Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "Group $($GROUP) (EXO):"
   Get-UnifiedGroup -Identity $groupSMTP
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
