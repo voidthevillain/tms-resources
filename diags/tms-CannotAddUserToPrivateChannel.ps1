@@ -58,7 +58,7 @@ function Get-OfficeUserLicense {
 
   return $licenses
 }
-
+# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 
 $user = (Get-MsolUser -UserPrincipalName $UPN)
 
