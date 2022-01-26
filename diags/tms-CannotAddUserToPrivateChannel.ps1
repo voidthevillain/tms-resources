@@ -123,8 +123,8 @@ if ($teamMembers -contains $UPN) {
   }
 }
 
-$sub = (Check-OfficeLicense $UPN).SKU
-$sps = (Check-OfficeLicense $UPN).ServicePlans
+# $sub = (Check-OfficeLicense $UPN).SKU
+# $sps = (Check-OfficeLicense $UPN).ServicePlans
 
 $issuePersists = Read-Host 'No issues found. Does the problem persist? [Y/N]'
 if ($issuePersists -eq 'Y') {
