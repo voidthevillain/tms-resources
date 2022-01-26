@@ -5,11 +5,11 @@
 # FOR A PARTICULAR PURPOSE. THE ENTIRE RISK OF USE, INABILITY TO USE, OR 
 # RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Author: Mihai Filip
+# AUTHOR: Mihai Filip
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Dependencies: Connect-MsolService
+# DEPENDENCIES: Connect-MsolService 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Usage: 
+# USAGE: 
 # Connect-MsolService
 # .\aad-GetOfficeUserLicense.ps1 user@domain.com
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
