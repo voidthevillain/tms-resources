@@ -28,6 +28,38 @@ Write-Host 'User:'$UPN
 Write-Host 'Team:'$groupSMTP
 Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
 
+# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
+# FUNCTIONS
+# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
+function Get-OfficeUserLicense {
+  param (
+    [string]$UserPrincipalName
+  )
+
+
+  $SKUs = (Get-MsolUser -UserPrincipalName $UserPrincipalName).Licenses.AccountSkuId
+  $ServicePlans = (Get-MsolUser -UserPrincipalName $UserPrincipalName).Licenses.ServiceStatus.ServicePlan.ServiceName
+
+  $licenses = @{
+    isLicensed = (Get-MsolUser -UserPrincipalName $UserPrincipalName).isLicensed
+    SKU = @()
+    ServicePlans = ''
+  }
+
+  if ($SKUs.length -gt 1) {
+    foreach ($SKU in $SKUs) {
+      $licenses.SKU += $SKU.split(":")[1]
+    }
+  } else {
+    $licenses.SKU += $SKUs.split(":")[1]
+  }
+
+  $licenses.ServicePlans = $ServicePlans
+
+  return $licenses
+}
+
+
 $user = (Get-MsolUser -UserPrincipalName $UPN)
 
 Write-Host 'Checking if the user exists:'
@@ -36,6 +68,21 @@ if ($user) {
   Write-Host -ForegroundColor Green 'The user exists.'
 } else {
   return Write-Host -ForegroundColor Red 'The user does not exist.'
+}
+
+$userLicenses = Get-OfficeUserLicense $UPN
+
+if ($userLicenses.isLicensed) {
+  Write-Host 'Checking if the user is licensed:'
+  Write-Host -ForegroundColor Green 'The user is licensed.'
+  if ($userLicenses.ServicePlans -contains 'TEAMS1') {
+    Write-Host 'Checking if the user is licensed for Teams:'
+    Write-Host -ForegroundColor Green 'The user is licensed for Teams.'
+  } else {
+    return Write-Host -ForegroundColor Red 'The user is not licensed for Teams.'
+  }
+} else {
+  return Write-Host -ForegroundColor Red 'The user is not licensed.'
 }
 
 $group = (Get-UnifiedGroup -Identity $groupSMTP)
