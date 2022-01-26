@@ -23,54 +23,6 @@ Param (
   $groupSMTP
 )
 
-# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# FUNCTIONS
-# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-function Is-UserLicensed {
-  param (
-    [string[]]$UserPrincipalName
-  )
-
-  $isLicensed = (Get-MsolUser -UserPrincipalName $UserPrincipalName).isLicensed
-
-  if ($isLicensed) {
-    return $true
-  } else {
-    return $false
-  }
-}
-
-# function Check-OfficeLicense { # ERRORS OUT ??
-#   param (
-#     [string[]]$UserPrincipalName
-#   )
-  
-#   $UserPrincipalName = $UserPrincipalName | Out-String
-
-#   Write-Host $UserPrincipalName
-#   Write-Host $UserPrincipalName.gettype()
-
-#   $SKUs = (Get-MsolUser -UserPrincipalName $UserPrincipalName).Licenses.AccountSkuId #.split(":")[1]
-#   $ServicePlans = (Get-MsolUser -UserPrincipalName $UserPrincipalName).Licenses.ServiceStatus.ServicePlan.ServiceName
-
-#   $licenses = @{
-#     SKU = @()
-#     ServicePlans = ''
-#   }
-
-#   if ($SKUs.length -gt 1) {
-#     foreach ($SKU in $SKUs) {
-#       $licenses.SKU += $SKU.split(":")[1]
-#     }
-#   } else {
-#     $licenses.SKU += $SKUs.split(":")[1]
-#   }
-
-#   $licenses.ServicePlans = $ServicePlans
-
-#   return $licenses
-# }
-
 Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
 Write-Host 'User:'$UPN
 Write-Host 'Team:'$groupSMTP
@@ -123,9 +75,6 @@ if ($teamMembers -contains $UPN) {
   }
 }
 
-# $sub = (Check-OfficeLicense $UPN).SKU
-# $sps = (Check-OfficeLicense $UPN).ServicePlans
-
 $issuePersists = Read-Host 'No issues found. Does the problem persist? [Y/N]'
 if ($issuePersists -eq 'Y') {
   $desktopPath = [Environment]::GetFolderPath("Desktop")
@@ -138,12 +87,6 @@ if ($issuePersists -eq 'Y') {
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "User $($UPN) (MSO):"
   Get-MsolUser -UserPrincipalName $UPN
-  # Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
-  # Write-Host "User $($UPN) subscriptions and service plans (MSO):"
-  # Write-Host 'SKUs:'
-  # Write-Host $sub
-  # Write-Host 'Service plans:'
-  # Write-Host $sps
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "Group $($GROUP) (EXO):"
   Get-UnifiedGroup -Identity $groupSMTP
