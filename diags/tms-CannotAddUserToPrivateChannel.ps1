@@ -58,8 +58,9 @@ function Get-OfficeUserLicense {
 
   return $licenses
 }
-# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 
+# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
+# USER
 $user = (Get-MsolUser -UserPrincipalName $UPN)
 
 Write-Host 'Checking if the user exists:'
@@ -85,6 +86,7 @@ if ($userLicenses.isLicensed) {
   return Write-Host -ForegroundColor Red 'The user is not licensed.'
 }
 
+# GROUP
 $group = (Get-UnifiedGroup -Identity $groupSMTP)
 
 Write-Host 'Checking if the M365 Group exists:'
@@ -95,6 +97,7 @@ if ($group) {
   return Write-Host -ForegroundColor Red 'The group does not exist.'
 }
 
+# TEAM
 $groupId = (Get-UnifiedGroup -Identity $groupSMTP).ExternalDirectoryObjectId
 $team = (Get-Team -GroupId $groupId)
 
@@ -106,6 +109,7 @@ if ($team) {
   return Write-Host -ForegroundColor Red 'The team does not exist.'
 }
 
+# MEMBERSHIP
 $teamMembers = (Get-TeamUser -GroupId $groupId).User
 
 Write-Host 'Checking if the user is a member of the team:'
@@ -128,6 +132,9 @@ if ($issuePersists -eq 'Y') {
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host 'Generating transcript:'
   Start-Transcript -Path "$($desktopPath)\CannotAddUserToPrivateChannel.txt"
+  Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
+  Write-Host 'User:'$UPN
+  Write-Host 'Team:'$groupSMTP
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "User $($UPN) (TMS):"
   Get-CsOnlineUser $UPN
