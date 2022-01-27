@@ -183,7 +183,7 @@ Write-Host 'Checking tenant EWS settings:'
 if ($tenantEwsEnabled -eq $null -OR $tenantEwsEnabled -eq $true) {
   Write-Host -ForegroundColor Green 'Tenant EWS is enabled.'
 } else {
-  $toEnableTenantEWS = Read-Host -ForegroundColor Yellow 'Tenant EWS is disabled. Would you like to enable it? [Y/N]'
+  $toEnableTenantEWS = Read-Host 'Tenant EWS is disabled. Would you like to enable it? [Y/N]'
   if ($toEnableTenantEWS -eq 'Y') {
     Set-OrganizationConfig -EwsEnabled $true 
     Write-Host -ForegroundColor Green 'Tenant EWS is now enabled.'
@@ -198,7 +198,7 @@ $tenantEwsApplicationAccessPolicy = (Get-OrganizationConfig).EwsApplicationAcces
 if ($tenantEwsApplicationAccessPolicy -eq $null) {
   Write-Host -ForegroundColor Green 'The tenant does not restrict EWS access.'
 } elseif ($tenantEwsApplicationAccessPolicy -eq 'EnforceAllowList') {
-  $toRemoveTenantEWSAllowList = Read-Host -ForegroundColor Yellow 'The tenant is allowing EWS access only for the applications in the allow list. Would you like to remove the restriction? [Y/N]'
+  $toRemoveTenantEWSAllowList = Read-Host 'The tenant is allowing EWS access only for the applications in the allow list. Would you like to remove the restriction? [Y/N]'
   if ($toRemoveTenantEWSAllowList -eq 'Y') {
     Set-OrganizationConfig -EwsApplicationAccessPolicy $null
     Write-Host -ForegroundColor Green 'The tenant does not restrict EWS access anymore.'
@@ -206,7 +206,7 @@ if ($tenantEwsApplicationAccessPolicy -eq $null) {
     return
   }
 } elseif ($tenantEwsApplicationAccessPolicy -eq 'EnforceBlockList') {
-  $toRemoveTenantEWSBlockList = Read-Host -ForegroundColor Yellow 'The tenant is blocking EWS access for the applications in the block list. Would you like to remove the restriction? [Y/N]'
+  $toRemoveTenantEWSBlockList = Read-Host 'The tenant is blocking EWS access for the applications in the block list. Would you like to remove the restriction? [Y/N]'
   if ($toRemoveTenantEWSBlockList -eq 'Y') {
     Set-OrganizationConfig -EwsApplicationAccessPolicy $null
     Write-Host -ForegroundColor Green 'The tenant does not restrict EWS access anymore.'
@@ -222,7 +222,7 @@ Write-Host 'Checking user EWS settings:'
 if ($userEwsEnabled -eq $null -OR $userEwsEnabled -eq $true) {
   Write-Host -ForegroundColor Green 'Mailbox EWS is enabled.'
 } else {
-  $toEnableUserEWS = Read-Host -ForegroundColor Yellow 'Mailbox EWS is disabled. Would you like to enable it? [Y/N]'
+  $toEnableUserEWS = Read-Host 'Mailbox EWS is disabled. Would you like to enable it? [Y/N]'
   if ($toEnableUserEWS -eq 'Y') {
     Set-CASMailbox -Identity $UPN -EwsEnabled $true
     Write-Host -ForegroundColor Green 'Mailbox EWS is now enabled.'
@@ -237,7 +237,7 @@ $userEwsApplicationAccessPolicy = (Get-CASMailbox -Identity $UPN).EwsApplication
 if ($userEwsApplicationAccessPolicy -eq $null) {
   Write-Host -ForegroundColor Green 'The mailbox does not restrict EWS access.'
 } elseif ($userEwsApplicationAccessPolicy -eq 'EnforceAllowList') {
-  $toRemoveMbxEWSAllowList = Read-Host -ForegroundColor Yellow 'The mailbox is allowing EWS access only for the applications in the allow list. Would you like to remove the restriction? [Y/N]'
+  $toRemoveMbxEWSAllowList = Read-Host 'The mailbox is allowing EWS access only for the applications in the allow list. Would you like to remove the restriction? [Y/N]'
   if ($toRemoveMbxEWSAllowList -eq 'Y') {
     Set-CASMailbox -Identity $UPN -EwsApplicationAccessPolicy $null
     Write-Host -ForegroundColor Green 'The mailbox does not restrict EWS access anymore.'
@@ -245,7 +245,7 @@ if ($userEwsApplicationAccessPolicy -eq $null) {
     return
   }
 } elseif ($userEwsApplicationAccessPolicy -eq 'EnforceBlockList') {
-  $toRemoveMbxEWSBlockList = -ForegroundColor Yellow Read-Host 'The mailbox is blocking EWS access for the applications in the block list. Would you like to remove the restriction? [Y/N]'
+  $toRemoveMbxEWSBlockList = Read-Host 'The mailbox is blocking EWS access for the applications in the block list. Would you like to remove the restriction? [Y/N]'
   if ($toRemoveMbxEWSBlockList -eq 'Y') {
     Set-CASMailbox -Identity $UPN -EwsApplicationAccessPolicy $null
     Write-Host -ForegroundColor Green 'The mailbox does not restrict EWS access anymore.'
