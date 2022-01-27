@@ -149,6 +149,7 @@ if ($issuePersists -eq 'Y') {
   Get-TeamUser -GroupId $groupId
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Stop-Transcript
+  Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host 'Please open a support request with the above transcript attached.'
 } else {
   return
