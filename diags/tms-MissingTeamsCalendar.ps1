@@ -285,6 +285,7 @@ if ($issuePersists -eq 'Y') {
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "Mailbox EWS settings (EXO):"
   Get-CASMailbox -Identity $UPN | select *ews*
+  Stop-Transcript
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host 'Please open a support request with the above transcript attached.'
 } else {
