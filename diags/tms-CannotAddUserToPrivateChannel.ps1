@@ -75,8 +75,8 @@ if ($user) {
 
 $userLicenses = Get-OfficeUserLicense $UPN
 
+Write-Host 'Checking if the user is licensed:'
 if ($userLicenses.isLicensed) {
-  Write-Host 'Checking if the user is licensed:'
   Write-Host -ForegroundColor Green 'The user is licensed.'
   if ($userLicenses.ServicePlans -contains 'TEAMS1') {
     Write-Host 'Checking if the user is licensed for Teams:'
