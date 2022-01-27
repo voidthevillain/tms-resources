@@ -55,7 +55,9 @@ function Get-OfficeUserLicense {
       $licenses.SKU += $SKU.split(":")[1]
     }
   } else {
-    $licenses.SKU += $SKUs.split(":")[1]
+    try {
+      $licenses.SKU += $SKUs.split(":")[1]
+    } catch {} # exception if user is unlicensed
   }
 
   $licenses.ServicePlans = $ServicePlans
@@ -252,7 +254,6 @@ if ($policy -eq $null) {
 }
 
 Write-Host 'Checking if the user has been granted an external access policy that allows to communicate with external users:'
-Write-Host 'Policy:'$policy
 if ($policy -eq 'FederationAndPICDefault' -OR $policy -eq 'FederationOnly') {
   Write-Host -ForegroundColor Green 'The user has been granted an external access policy that allows to communicate with external users.'
 } elseif ($policy -eq 'NoFederationAndPIC') {
@@ -340,7 +341,6 @@ if (!$isAllowList) {
       return
     }
   }
-
   if (!$isBlockList) {
     Write-Host -ForegroundColor Green 'The organization is not blocking communications with any domain.'
   } else {
