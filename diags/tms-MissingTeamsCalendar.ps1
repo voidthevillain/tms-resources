@@ -15,6 +15,8 @@
 # Connect-MicrosoftTeams
 # .\tms-TeamsCalendar.ps1 user@domain.com
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
+# Back it up with https://aka.ms/TeamsCalendarDiag
+# ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 
 [CmdletBinding()]
 Param (
