@@ -46,7 +46,9 @@ function Get-OfficeUserLicense {
       $licenses.SKU += $SKU.split(":")[1]
     }
   } else {
-    $licenses.SKU += $SKUs.split(":")[1]
+    try {
+      $licenses.SKU += $SKUs.split(":")[1]
+    } catch {} # exception if user is unlicensed
   }
 
   $licenses.ServicePlans = $ServicePlans
@@ -58,7 +60,7 @@ $user = (Get-MsolUser -UserPrincipalName $UPN)
 
 Write-Host 'Checking if the user exists:'
 if ($user) {
-  Write-Host 'The user exists.'
+  Write-Host -ForegroundColor Green 'The user exists.'
 } else {
   return Write-Host -ForegroundColor Red 'The user does note exist.'
 }
