@@ -96,8 +96,9 @@ function Get-IsAppInUserAppSetupPolicy {
 
   return $false
 }
+
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# User & Licenses
+# USER & LICENSES
 $user = Get-MsolUser -UserPrincipalName $UPN
 
 Write-Host 'Checking if the user exists:'
@@ -118,14 +119,14 @@ if ($userLicense.isLicensed) {
 
 Write-Host 'Checking user licenses:'
 
-# check Teams (TEAMS1)
+# CHECK TEAMS (TEAMS1)
 if ($userLicense.ServicePlans -contains 'TEAMS1') {
   Write-Host -ForegroundColor Green 'The user is licensed for Teams.'
 } else {
   return Write-Host -ForegroundColor Red 'The user is not licensed for Teams.'
 }
 
-# check SfBO (MCOSTANDARD, MCO_TEAMS_IW)
+# CHECK SfBO (MCOSTANDARD, MCO_TEAMS_IW)
 if ($userLicense.ServicePlans -contains 'MCOSTANDARD' -OR $userLicense.ServicePlans -contains 'MCO_TEAMS_IW' ) {
   Write-Host -ForegroundColor Green 'The user is licensed for Skype for Business Online.'
 } else {
@@ -134,7 +135,7 @@ if ($userLicense.ServicePlans -contains 'MCOSTANDARD' -OR $userLicense.ServicePl
   Write-Host -ForegroundColor Red 'The user is not licensed for Skype for Business Online.'
 }
 
-# check Exchange Online (EXCHANGE_S_STANDARD, EXCHANGE_S_ENTERPRISE) 
+# CHECK EXO (EXCHANGE_S_STANDARD, EXCHANGE_S_ENTERPRISE) 
 if ($userLicense.ServicePlans -contains 'EXCHANGE_S_STANDARD' -OR $userLicense.ServicePlans -contains 'EXCHANGE_S_ENTERPRISE') {
   Write-Host -ForegroundColor Green 'The user is licensed for Exchange Online.'
 } else {
@@ -142,7 +143,7 @@ if ($userLicense.ServicePlans -contains 'EXCHANGE_S_STANDARD' -OR $userLicense.S
 }
 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Coexistence mode
+# COEXISTENCE
 $coexistenceMode = (Get-CsOnlineUser $UPN).TeamsUpgradeEffectiveMode
 
 Write-Host 'Checking the coexistence mode of the user:'
@@ -153,7 +154,7 @@ if ($coexistenceMode -eq 'SfBOnly' -OR $coexistenceMode -eq 'SfBWithTeamsCollab'
 }
 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# App setup policy
+# APP SETUP POLICY
 $calendarId = 'ef56c0de-36fc-4ef8-b417-3d82ba9d073c'
 $appInPolicy = Get-IsAppInUserAppSetupPolicy $UPN $calendarId
 Write-Host 'Checking if the app setup policy of the user includes Calendar:'
@@ -165,7 +166,7 @@ if ($appInPolicy) {
 }
 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# Exchange homing
+# EXCHANGE HOMING
 $recipientType = (Get-Mailbox -Identity $UPN).RecipientTypeDetails
 Write-Host 'Checking the Exchange homing of the user:'
 
@@ -177,8 +178,9 @@ if ($recipientType -eq 'UserMailbox') {
 
 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# EWS settings for tenant and user
-# check tenant and user EWS settings and offer corrections
+# EWS SETTINGS
+
+# TENANT EWS
 $tenantEwsEnabled = (Get-OrganizationConfig).EwsEnabled
 Write-Host 'Checking tenant EWS settings:'
 
@@ -194,7 +196,7 @@ if ($tenantEwsEnabled -eq $null -OR $tenantEwsEnabled -eq $true) {
   }
 }
 
-# tenant EWS restrictions
+# TENANT EWS RESTRICTIONS
 $tenantEwsApplicationAccessPolicy = (Get-OrganizationConfig).EwsApplicationAccessPolicy
 
 if ($tenantEwsApplicationAccessPolicy -eq $null) {
@@ -217,7 +219,7 @@ if ($tenantEwsApplicationAccessPolicy -eq $null) {
   }
 }
 
-# user EWS
+# USER EWS
 $userEwsEnabled = (Get-CASMailbox -Identity $UPN).EwsEnabled
 Write-Host 'Checking user EWS settings:'
 
@@ -233,7 +235,7 @@ if ($userEwsEnabled -eq $null -OR $userEwsEnabled -eq $true) {
   }
 }
 
-# user EWS restrictions
+# USER EWS RESTRICTIONS
 $userEwsApplicationAccessPolicy = (Get-CASMailbox -Identity $UPN).EwsApplicationAccessPolicy
 
 if ($userEwsApplicationAccessPolicy -eq $null) {
@@ -263,6 +265,8 @@ if ($issuePersists -eq 'Y') {
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host 'Generating transcript:'
   Start-Transcript -Path "$($desktopPath)\MissingTeamsCalendar.txt"
+  Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
+  Write-Host 'User:'$UPN
   Write-Host '...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -.'
   Write-Host "User $($UPN) (TMS):"
   Get-CsOnlineUser $UPN
