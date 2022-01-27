@@ -52,7 +52,9 @@ function Get-OfficeUserLicense {
       $licenses.SKU += $SKU.split(":")[1]
     }
   } else {
-    $licenses.SKU += $SKUs.split(":")[1]
+    try {
+      $licenses.SKU += $SKUs.split(":")[1]
+    } catch {} # exception if user is unlicensed
   }
 
   $licenses.ServicePlans = $ServicePlans
