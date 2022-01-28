@@ -7,7 +7,7 @@
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 # AUTHOR: Mihai Filip
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
-# DEPENDENCIES: Connect-MsolService, Connect-ExchangeOnline
+# DEPENDENCIES: Connect-AzureAD
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 # USAGE: 
 # Connect-AzureAD
