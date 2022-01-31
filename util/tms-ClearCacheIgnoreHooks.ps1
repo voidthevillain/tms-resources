@@ -8,14 +8,17 @@
 # AUTHOR: Mihai Filip
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 # USAGE: 
-# .\tms-ClearCacheIgnoreHooks.ps1 user@domain.com team@domain.com
+# .\tms-ClearCacheIgnoreHooks.ps1
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 $teams = Get-Process Teams -ErrorAction SilentlyContinue
 $outlook = Get-Process Outlook -ErrorAction SilentlyContinue
 
+$outlookWasOpen = $false
+
 # check if Outlook is running and quit it to clear add-in cache
 if ($outlook) {
-  Write-Host 'Outlook is running. Quitting Outlook.'
+  Write-Host 'Outlook is running. Quitting...'
+  $outlookWasOpen = $true
   $outlook | Stop-Process -Force
   Start-Sleep 2
 } else {
@@ -24,14 +27,14 @@ if ($outlook) {
 
 # check if Teams is running and quit it to clear cache
 if ($teams) {
-  Write-Host 'Teams is running. Quitting Teams'
+  Write-Host 'Teams is running. Quitting...'
   $teams | Stop-Process -Force
   Start-Sleep 2
 } else {
   Write-Host 'Teams is not running.'
 }
 
-# clear cache (check for hooks.json and leave that)
+# clear cache (check for hooks.json and ignore  that)
 gci -path $env:AppData\Microsoft\Teams | foreach { 
   if ($_.Name -ne 'hooks.json') {
     Remove-Item $_.FullName -Recurse -Force 
@@ -39,10 +42,12 @@ gci -path $env:AppData\Microsoft\Teams | foreach {
 }
 Write-Host 'Cache cleared.'
 
-# start Outlook
-$toStartOutlook = Read-Host 'Do you wish to start Outlook? [Y/N]'
-if ($toStartOutlook -eq 'Y') {
-  Start-Process Outlook
+# start Outlook (if it was open)
+if ($outlookWasOpen) {
+  $toStartOutlook = Read-Host 'Do you wish to start Outlook? [Y/N]'
+  if ($toStartOutlook -eq 'Y') {
+    Start-Process Outlook
+  }
 }
 
 # start Teams
