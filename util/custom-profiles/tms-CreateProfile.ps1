@@ -58,7 +58,6 @@ function Get-CustomProfilesPath {
   } else {
     return $false
   }
-
 }
 
 function Get-CustomProfiles {
@@ -73,11 +72,9 @@ function New-CustomProfile {
   )
 
   $scriptPath = "$($HOME)\Documents\WindowsPowerShell\tms-CustomProfiles.ps1"
-
   
   PowerShell.exe -File $scriptPath $pName
-  
-}
+  }
 
 # ...- --- .. -.. - .... . ...- .. .-.. .-.. .- .. -. 
 Write-Host 'Checking if profile script exists:'
