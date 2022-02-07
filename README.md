@@ -1,2 +1,1 @@
-# tms-diags
-teams diagnostic scripts
+xxxxxxxxxxxxxxx
